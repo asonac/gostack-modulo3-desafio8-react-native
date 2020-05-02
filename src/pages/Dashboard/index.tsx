@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 
 import { View, Image } from 'react-native';
@@ -30,12 +30,17 @@ interface Product {
 
 const Dashboard: React.FC = () => {
   const { addToCart } = useCart();
+  const imageRef = useRef<Image>(null);
 
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
       // TODO
+      const response = await api.get('/products');
+      const listOfProducts: Product[] = response.data;
+
+      setProducts(listOfProducts);
     }
 
     loadProducts();
@@ -43,6 +48,7 @@ const Dashboard: React.FC = () => {
 
   function handleAddToCart(item: Product): void {
     // TODO
+    addToCart(item);
   }
 
   return (
@@ -57,7 +63,7 @@ const Dashboard: React.FC = () => {
           }}
           renderItem={({ item }) => (
             <Product>
-              <ProductImage source={{ uri: item.image_url }} />
+              <ProductImage ref={imageRef} source={{ uri: item.image_url }} />
               <ProductTitle>{item.title}</ProductTitle>
               <PriceContainer>
                 <ProductPrice>{formatValue(item.price)}</ProductPrice>
